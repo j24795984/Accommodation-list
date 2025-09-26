@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>宿舍名單</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-right: 24px;
+      flex: 1;
+    }
+
+    button {
+      background-color: #c3eeff;
+      border-radius: 5px;
+      border-color: #9ac9df;
+      padding: 4px 8px;
+      color: #1b335f;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    button:hover {
+      background-color: #a3d4e7;
+    }
+
+    hr {
+      margin: 0 50px;
+      border-width: 1px;
+      border-radius: 5px;
+      border-color: #e6e6e6;
+      border-style: double;
+    }
+
+    #room-list {
+      padding: 20px;
+    }
+
+    /* #container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      font-size: 18px;
+    } */
+
+    h1 {
+      text-align: center;
+    }
+
+    #container {
+      padding: 24px 48px;
+      font-size: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .mask {
+      background-color: #00000093;
+      width: 100%;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 5;
+      display: none;
+    }
+
+    #edit-area {
+      background-color: #eefcff;
+      width: 380px;
+      padding: 36px 48px;
+      border-radius: 10px;
+      box-shadow: 3px 3px 10px #00000048;
+      margin: auto;
+      margin-top: 20vh;
+    }
+
+    #edit-area button {
+      width: 100%;
+      padding: 8px 16px;
+      word-spacing: 1rem;
+      font-size: 16px;
+    }
+
+    .edit-area-title {
+      width: 100%;
+      margin-bottom: 16px;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    #date {
+      width: 140px;
+    }
+
+
+    /* .room-container {
+      display: flex;
+      justify-content: space-between;
+      border: 2px solid black;
+      padding: 8px;
+    } */
+
+    .room-container {
+      width: calc((100% - 16px * 2) / 3);
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      border: 2px solid #7187af;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    @media (max-width:1048px) {
+      .room-container {
+        width: calc((100% - 16px * 1) / 2);
+      }
+    }
+
+    .roomer-area {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+    }
+
+    .roomer-area>div {
+      background-color: #FFF;
+      box-shadow: 0px 0px 5px #d3f2ff;
+      padding: 16px 24px;
+      border-radius: 4px;
+    }
+
+    .roomer-area li {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .roomer-area li span.title {
+      flex-shrink: 0;
+    }
+
+    .roomer-area li span.info {
+      flex: 1;
+    }
+
+    .gender-container {
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn-area {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .used {
+      background-color: #deeaf5;
+    }
+  </style>
+</head>
+
+<body>
+  <section id="room-list">
+    <section class="mask">
+      <form id="edit-area">
+        <div class="edit-area-title">修改住宿資訊</div>
+        <div class="roomer-area">
+          <div>
+            房號：
+            <span id="room-number"></span>
+          </div>
+          <div>
+            <label for="name">
+              姓名：
+              <input type="text" id="name">
+            </label>
+          </div>
+          <div class="gender-container">
+            <span>性別：</span>
+            <label for="male">
+              <input type="radio" name="gender" id="male" value="男">
+              男
+            </label>
+            <label for="female">
+              <input type="radio" name="gender" id="female" value="女">
+              女
+            </label>
+            <label for="other">
+              <input type="radio" name="gender" id="other" value="其他">
+              其他
+            </label>
+          </div>
+          <div>
+            <label for="phone">
+              手機：
+              <input type="tel" id="phone">
+            </label>
+          </div>
+          <div>
+            <label for="email">
+              信箱：
+              <input type="email" id="email">
+            </label>
+          </div>
+          <div>
+            <label for="date">
+              入住日期：
+              <input type="date" id="date">
+            </label>
+          </div>
+        </div>
+        <br>
+        <button type="button" id="submit-btn">儲 存</button>
+      </form>
+    </section>
+
+    <h1>宿舍名單</h1>
+    <br>
+    <hr>
+    <div id="container">
+
+    </div>`
+
+    </div>
+    </div>
+  </section>
+
+  <script>
+    /**
+     * 題目：
+     * 你是一個宿舍管理員，宿舍總共有 10 間套房，套房編號從 101 到 110，目前尚未有住戶入住
+     * 每間套房可以住一位住戶，如果有住戶入住，就會在畫面上顯示住戶的資料
+     * 住戶的資料有姓名、性別、手機、信箱以及入住日期
+     * 當按下編輯按鈕時，住戶的資料會被帶入編輯區塊，並且可以修改
+     * 當按下儲存按鈕時，編輯區塊的資料會被更新到住戶的資料
+     */
+    const showEdit = document.querySelector('.mask');
+    const roomContainer = document.querySelector('#container');
+    const rooms = 10; //10 間
+    const startNumber = 101;
+    const roomAll = [];
+    let selecterRoom = null;
+
+    // 編輯區物件
+    const inputRoomNumber = document.querySelector('#room-number');
+    const inputName = document.querySelector('#name');
+    const inputGender = document.querySelectorAll('input[name="gender"]');
+    const inputTel = document.querySelector('#phone');
+    const inputEmail = document.querySelector('#email');
+    const inputDate = document.querySelector('#date');
+    const saveBtn = document.querySelector('#submit-btn');
+    // =========== 
+
+    // 產生房間
+    initializeRoom();
+
+    //render
+    render();
+
+    // 綁定監聽器
+    bindEditBtn();
+    bindDeleteBtn()
+
+    //等待案儲存中
+    waitingSave()
+
+    // function ========================================= 
+    function initializeRoom() {
+      for (let i = 0; i < rooms; i++) {
+        roomAll.push({
+          id: startNumber + i,
+          name: '',
+          gender: '',
+          tel: '',
+          email: '',
+          inTime: '',
+        });
+      }
+    }
+
+    function render() {
+      let content = '';
+      roomAll.forEach((item, index) => {
+        content += `
+        <article class="room-container room${item.id}">
+          <ul class="roomer-area">
+            <li>
+              <span class="title"> 房號： </span>
+              <span class="info"> ${item.id} </span>
+            </li>
+            <li>
+              <span class="title"> 姓名： </span>
+              <span class="info"> ${item.name} </span>
+            </li>
+            <li>
+              <span class="title"> 性別： </span>
+              <span class="info"> ${item.gender} </span>
+            </li>
+            <li>
+              <span class="title"> 手機： </span>
+              <span class="info"> ${item.tel} </span>
+            </li>
+            <li>
+              <span class="title"> 信箱：</span>
+              <span class="info"> ${item.email} </span>
+            </li>
+            <li>
+              <span class="title"> 入住日期： </span>
+              <span class="info"> ${item.inTime} </span>
+            </li>
+          </ul>
+          <section class="btn-area">
+            <button type="button" class="edit-btn" data-id="${item.id}">修改</button>
+            <button type="button" class="delete-btn" data-id="${item.id}">清空</button>
+          </section>
+        </article>`;
+        // 用 data-id="${item.id}" 去判斷點擊的按鈕要傳給誰
+      })
+      roomContainer.innerHTML = content;
+    }
+
+    // 按鈕綁定
+    function bindEditBtn() {
+      // 定義全部的按鈕
+      const editBtn = document.querySelectorAll('.edit-btn');
+      editBtn.forEach(btn => {
+        //這裡是回傳整個房間的資料
+        btn.addEventListener('click', () => {
+          //1. 尋找符合條件的房間   (rome == item)
+          selecterRoom = roomAll.find(room => {
+            //2. 找到 room.id === Number(btn.dataset.id) 的房間
+            //3. 回傳 陣列 roomAll 中的物件[room]之中 (id 跟btn.dataset.id 相同 ) 的物件 
+            return room.id === Number(btn.dataset.id);
+          })
+          console.log(selecterRoom);
+
+          showEdit.style.display = 'block';
+
+          setSelectedRoomData();
+        })
+      })
+    }
+
+    function bindDeleteBtn() {
+      const deleteBtn = document.querySelectorAll('.delete-btn');
+      deleteBtn.forEach(btn => {
+        btn.addEventListener('click', () => {
+          selecterRoom = roomAll.find(room => {
+            return room.id === Number(btn.dataset.id);
+          })
+          console.log('jj', selecterRoom);
+
+          selecterRoom.name = '';
+          selecterRoom.gender = '';
+          selecterRoom.tel = '';
+          selecterRoom.email = '';
+          selecterRoom.inTime = '';
+
+          const deleteRoom = document.querySelector(`.room${Number(btn.dataset.id)} ul`)
+          deleteRoom.innerHTML = `
+          <li>
+              <span class="title"> 房號： </span>
+              <span class="info"> ${selecterRoom.id} </span>
+            </li>
+            <li>
+              <span class="title"> 姓名： </span>
+              <span class="info"> ${selecterRoom.name} </span>
+            </li>
+            <li>
+              <span class="title"> 性別： </span>
+              <span class="info"> ${selecterRoom.gender} </span>
+            </li>
+            <li>
+              <span class="title"> 手機： </span>
+              <span class="info"> ${selecterRoom.tel} </span>
+            </li>
+            <li>
+              <span class="title"> 信箱：</span>
+              <span class="info"> ${selecterRoom.email} </span>
+            </li>
+            <li>
+              <span class="title"> 入住日期： </span>
+              <span class="info"> ${selecterRoom.inTime} </span>
+            </li>
+          `
+          const checkRoom = document.querySelector(`.room${selecterRoom.id}`)
+          if (checkRoom.classList.contains('used')) {
+            checkRoom.classList.remove('used');
+          }
+          clearInput();
+        })
+      })
+    }
+
+    function setSelectedRoomData() {
+      inputRoomNumber.textContent = selecterRoom.id;
+      inputName.value = selecterRoom.name;
+      inputGender.forEach(item => {
+        if (item.value === selecterRoom.gender) {
+          item.checked = true;
+        } else {
+          item.checked = false;
+        }
+      });
+      inputTel.value = selecterRoom.tel;
+      inputEmail.value = selecterRoom.email;
+      inputDate.value = selecterRoom.inTime;
+    }
+
+    function waitingSave() {
+      //點儲存
+      saveBtn.addEventListener('click', () => {
+        if (selecterRoom === null) {
+          alert('請先選擇要修改的住戶');
+          return;
+        };
+
+        //找到要修改的物件，並為他建立定義一個方便的名稱(還是原本的位置跟名稱)
+        const editRoom = roomAll.find(room => {
+          // 這邊就是  如果它裡面的物件福條件，回傳他自己
+          // if (room.id === selecterRoom.id) {
+          //   return room;
+          // }
+
+          return room.id === selecterRoom.id
+        });
+
+        editRoom.name = inputName.value;
+        inputGender.forEach(item => {
+          if (item.checked) {
+            editRoom.gender = item.value;
+          }
+        })
+        editRoom.tel = inputTel.value;
+        editRoom.email = inputEmail.value;
+        editRoom.inTime = inputDate.value;
+        console.log(editRoom);
+        console.log(roomAll);
+
+        //  有人  變色
+        const checkRoom = document.querySelector(`.room${editRoom.id}`)
+        if (editRoom.name !== '' && checkRoom.classList.contains('used') !== true) {
+          checkRoom.classList.add('used');
+        }
+        // ================== 
+
+        // 找到這個 DOM (房間ID === 選擇的ID)
+        const saveRoom = document.querySelector(`.room${editRoom.id} ul`)
+        saveRoom.innerHTML = `
+          <li>
+              <span class="title"> 房號： </span>
+              <span class="info"> ${editRoom.id} </span>
+            </li>
+            <li>
+              <span class="title"> 姓名： </span>
+              <span class="info"> ${editRoom.name} </span>
+            </li>
+            <li>
+              <span class="title"> 性別： </span>
+              <span class="info"> ${editRoom.gender} </span>
+            </li>
+            <li>
+              <span class="title"> 手機： </span>
+              <span class="info"> ${editRoom.tel} </span>
+            </li>
+            <li>
+              <span class="title"> 信箱：</span>
+              <span class="info"> ${editRoom.email} </span>
+            </li>
+            <li>
+              <span class="title"> 入住日期： </span>
+              <span class="info"> ${editRoom.inTime} </span>
+            </li>
+          `
+        // ==================================== 
+
+        //按儲存後 清空
+        clearInput();
+        showEdit.style.display = 'none';
+      })
+    }
+
+    function clearInput() {
+      selecterRoom = null;
+      inputRoomNumber.textContent = '';
+      inputName.value = '';
+      inputGender.forEach(item => item.checked = false);
+      inputTel.value = '';
+      inputEmail.value = '';
+      inputDate.value = '';
+    };
+  </script>
+</body>
+
+</html>
